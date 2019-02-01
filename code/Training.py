@@ -5,7 +5,9 @@ import numpy as np
 import torch
 import pickle
 
-env = UnityEnvironment(file_name='../Reacher.app')
+NO_GRAPHICS = True
+
+env = UnityEnvironment(file_name='../Reacher.app', no_graphics=NO_GRAPHICS)
 
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
@@ -31,7 +33,7 @@ agent = Agent(state_size, action_size, seed=0)
 
 env_info = env.reset(train_mode=True)[brain_name]     
 state = env_info.vector_observations[0]                  
-scores_window = deque(maxlen=100)
+scores_window = deque(maxlen=10)
 success_score = 30
 scores = []
 for i_episode in range(1500):
@@ -49,11 +51,11 @@ for i_episode in range(1500):
 	scores_window.append(score)
 	scores.append(score)
 
-	if i_episode%100 == 0:
+	if i_episode%10 == 0:
 		print('\rEpisode {} \tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
 
 	if np.mean(scores_window) >= success_score:
-		print('Environment solved in {:d} episodes. Average Score: {:.2f} Saving model parameters.'.format(i_episode-100,np.mean(scores_window)))
+		print('Environment solved in {:d} episodes. Average Score: {:.2f} Saving model parameters.'.format(i_episode-10,np.mean(scores_window)))
 		torch.save(agent.local_qnetwork.state_dict(), 'checkpoint.pth')
 		success_score+=1
 env.close()
