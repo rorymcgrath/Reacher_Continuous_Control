@@ -1,0 +1,34 @@
+\title{Project 2: Continuous Control}
+\author{
+	Rory McGrath \\
+}
+\date{\today}
+
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\bibliography{References}
+\usepackage[table]{xcolor}
+
+\begin{document}
+\maketitle
+
+
+\section{Overview}
+In this environment, a double-jointed arm acts as the agent and can move to target locations.
+A reward of +0.1 is provided for each step that the agent's hand is in the goal location. 
+The goal of the agent is to maintain its position at the target location for as many time steps as possible.
+
+The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. 
+Each action is a vector with four numbers, corresponding to torque applicable to two joints. 
+Every entry in the action vector should be a number between -1 and 1.
+
+This task is episodic,  in order to solve the environment the agent must achieve an average score of +30 over 100 consecutive episodes.
+
+\section{Methods}
+\section{Results}
+\section{Future Work}
+
+\printbibliography
+\end{document}
