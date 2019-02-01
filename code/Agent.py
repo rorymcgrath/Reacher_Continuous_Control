@@ -9,13 +9,13 @@ from ReplayBuffer import ReplayBuffer
 from Actor import Actor
 from Critic import Critic 
 
-ACTOR_LEARNING_RATE = 5e-4
-CRITIC_LEARNING_RATE = 5e-4
+ACTOR_LEARNING_RATE = 1e-4
+CRITIC_LEARNING_RATE = 1e-3
 BUFFER_SIZE = int(1e5)
-BATCH_SIZE = 64
-UPDATE_EVERY = 4
+BATCH_SIZE = 128
 GAMMA = 0.99
 TAU = 1e-3
+WEIGHT_DECAY = 0
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -52,7 +52,7 @@ class Agent():
 		self.critic_target = Critic(state_size, action_size, seed).to(device)
 
 		self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=ACTOR_LEARNING_RATE)
-		self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=CRITIC_LEARNING_RATE)
+		self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=CRITIC_LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 
 		#Replay Memory
 		self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
@@ -95,7 +95,7 @@ class Agent():
 			self.train_model_parameters(experiences)
 
 	
-	def get_action(self, state, epsilon=0, add_noise=True):
+	def get_action(self, state, epsilon=0, add_noise=False):
 		'''Gets the action for the given state defined by the current policy.
 
 		The method returns the action to take for the given state given the current policy.
@@ -120,8 +120,8 @@ class Agent():
 		with torch.no_grad():
 			action = self.actor_local(state).to(device).data.numpy()
 		self.actor_local.train()
-#		if add_noise:
-#			action+=self.noise.sample()
+		if add_noise:
+			action+=self.noise.sample()
 		return np.clip(action,-1,1)
 
 	def train_model_parameters(self, experiences):
