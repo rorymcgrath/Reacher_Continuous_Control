@@ -10,13 +10,13 @@ from Actor import Actor
 from Critic import Critic 
 
 ACTOR_LEARNING_RATE = 1e-4
-CRITIC_LEARNING_RATE = 1e-3
+CRITIC_LEARNING_RATE = 1e-4
 BUFFER_SIZE = int(1e5)
-BATCH_SIZE = 128
+BATCH_SIZE = 1024
 GAMMA = 0.99
 TAU = 1e-3
 WEIGHT_DECAY = 0
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 #Going to solve this using DDPG Deep Deterministic Policy Gradient
@@ -25,7 +25,7 @@ class Agent():
 	'''This agent Interacts with the environment to learn a policy that yields the highest commulative reward.
 		The agent uses Deep-Qlearning and is implemented used Fixed Q-Targets.'''
 
-	def __init__(self, state_size, action_size, seed):
+	def __init__(self, state_size, action_size, seed=0):
 		'''Initlize the Agent.
 		
 		Parameters
@@ -56,7 +56,6 @@ class Agent():
 
 		#Replay Memory
 		self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
-		self.t_step = 0
 
 		#Noise
 		self.noise = OUNoise(action_size,seed)
@@ -87,15 +86,12 @@ class Agent():
 			True if the episode is completed, else False
 		'''
 		self.memory.add(state, action, reward, next_state, done)
-		
-	#	self.t_step = (self.t_step+1)%UPDATE_EVERY
-	#	if self.t_step == 0:
 		if len(self.memory) > BATCH_SIZE:
 			experiences = self.memory.sample()
 			self.train_model_parameters(experiences)
 
 	
-	def get_action(self, state, epsilon=0, add_noise=False):
+	def get_action(self, state, epsilon=0, add_noise=True):
 		'''Gets the action for the given state defined by the current policy.
 
 		The method returns the action to take for the given state given the current policy.
@@ -118,7 +114,7 @@ class Agent():
 		state = torch.from_numpy(state).float().unsqueeze(0).to(device)
 		self.actor_local.eval()
 		with torch.no_grad():
-			action = self.actor_local(state).to(device).data.numpy()
+			action = self.actor_local(state).cpu().data.numpy()
 		self.actor_local.train()
 		if add_noise:
 			action+=self.noise.sample()
@@ -143,7 +139,6 @@ class Agent():
 		#Update critic
 		next_actions = self.actor_target(next_states)
 		Q_next_states = self.critic_target(next_states,next_actions)
-		#Q_next_states = self.target_qnetwork(next_states).detach().max(1)[0].unsqueeze(1)
 		Q_states = rewards + GAMMA*Q_next_states*(1-dones)
 		Q_states_estimated = self.critic_local(states,actions)
 		critic_loss = F.mse_loss(Q_states_estimated, Q_states)
@@ -157,7 +152,6 @@ class Agent():
 		self.actor_optimizer.zero_grad()
 		actor_loss.backward()
 		self.actor_optimizer.step()	
-
 
 		self._update_model_parameters(self.critic_local, self.critic_target)     
 		self._update_model_parameters(self.actor_local, self.actor_target)     
@@ -176,7 +170,7 @@ class Agent():
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
 
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
+    def __init__(self, size, seed=0, mu=0., theta=0.15, sigma=0.2):
         """Initialize parameters and noise process."""
         self.mu = mu * np.ones(size)
         self.theta = theta
