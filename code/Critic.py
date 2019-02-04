@@ -26,20 +26,28 @@ class Critic(nn.Module):
 		self.fc3 = nn.Linear(state_size,1)
 
 	def forward(self,state,action):
-		'''Build the network that estimates Q values for each state.
+		'''Build the network that estimates the value function for the state action pair.
 
-		The action is added to the last hidden layer.
-		#Why? it's mentioned in the DDQN paper but they don't reference why.
+		The model estimates the value function for the current state and action pair.
+		Similar to the DDQN paper, the action is added to the last hidden layer.
+		Added the action to the final hidden layer would speed up training if there where multiple hidden layers.
+		This this case the majority of the hidden layers determinig high level feature representations of the state.
+		The features are then added to the action in the finial state.
+		This is the general idea behind transfer learning.
+		Given that this model only has one hidden layer, it is done to more accurately recreate the architecture mentioned in the DDQN paper.
+
 		Parameters
 		----------
 		state : array_like
 			The current state.
 
+		action :  array_like
+			The current action that was taken
 
 		Returns
 		-------
-		Q_values : array_like
-			The Q_values for each action given the current state.
+		Value : float
+			The estimate value of the value function for the current state action pair.
 		'''
 		x = F.relu(self.fc1(state))
 		x1 = torch.cat((x,action.float()),dim=1)

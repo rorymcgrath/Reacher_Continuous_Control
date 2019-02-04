@@ -23,7 +23,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Agent():
 	'''This agent Interacts with the environment to learn a policy that yields the highest commulative reward.
-		The agent uses Deep-Qlearning and is implemented used Fixed Q-Targets.'''
+		The agent uses the Deep Deterministic Policy Gradient algorithm'''
 
 	def __init__(self, state_size, action_size, seed=0):
 		'''Initlize the Agent.
@@ -65,8 +65,7 @@ class Agent():
 
 		Executes each time the agent takes a step in the environment.
 		The observed (state, action, reward, next_state, done) tuple is saved in the replay buffer.
-		On every UPDATE_EVERY step the agent learns by sampling the replay buffer to obtain BATCH_SIZE previous experiences.
-		These experiences are used to train and update the local .
+		Once enough experiences have been captured the model is trained.
 		
 		Parameters
 		----------
@@ -95,8 +94,8 @@ class Agent():
 		'''Gets the action for the given state defined by the current policy.
 
 		The method returns the action to take for the given state given the current policy.
-		The current policy is epsilon-greedy and the action values Q are estimated using
-		the local .
+		In order to explore in the continuous space noise is added to the action.
+		
 
 		Parameters
 		----------
@@ -106,10 +105,13 @@ class Agent():
 		epsilon : float
 			The epsilon value usedfor epsilon-greedy action selection.
 
+		add_noise : boolean
+			Add noise to the action to encourage exploration.
+
 		Returns
 		-------
-		action : int
-			The action to take.
+		action : array-like
+			The action to take. Each value is between -1 and 1.
 		'''
 		state = torch.from_numpy(state).float().unsqueeze(0).to(device)
 		self.actor_local.eval()
@@ -123,11 +125,13 @@ class Agent():
 	def train_model_parameters(self, experiences):
 		'''Update the model parameters using the given batch of experience tuples.
 
-		This method updates the local QNetwork using the target QNetwork.
-		The Q values for the next states are calculate using the target network.
-		The Q values for the current states are then calculated.
-		The local network is then updated by estimating the Q values for the current state.
-		Mean sequare error loss is used.
+		The models are train via the Actor Critic paradigm.
+		The next action is optained fromt he target actor.
+		This is then passed to the target critic to obtain the target next state.
+		The target current state is calculated via the bellman equations.
+		The local critic estimates the next state and is updated accordingly.	
+		The local actions predictions the next actions given the current state.
+		The loss for the actor is calculated as the ...
 
 		Parameters
 		----------
@@ -160,15 +164,15 @@ class Agent():
 		'''Copy the learned local network parameters to the target network.
 
 		This method updates the Target network with the learned network parameters.
-		By fixing the Q-targets and only updating the local model every UPDATE_EVERY timestep
-		we help redude the amount of harmful correlation by constating moving the target.
+		The target parameters are old movd TAU towards the learned local parameters.
+		The is done to help redude the amount of harmful correlation by constating moving the target.
 		'''
 		for target_param, local_param in zip(target_network.parameters(), local_network.parameters()):
 			target_param.data.copy_(TAU*local_param.data + (1-TAU) * target_param.data)
 
 
 class OUNoise:
-    """Ornstein-Uhlenbeck process."""
+    """Ornstein-Uhlenbeck process. This noise is added to the action to promote exploration."""
 
     def __init__(self, size, seed=0, mu=0., theta=0.15, sigma=0.2):
         """Initialize parameters and noise process."""

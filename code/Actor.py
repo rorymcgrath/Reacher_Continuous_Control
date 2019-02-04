@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class Actor(nn.Module):
-	'''The Actor Q network used by the agent.'''
+	'''The Actor network used by the agent.'''
 
 	def __init__(self,state_size,action_size,seed=0):
 		'''Initlise and defined the model.
@@ -26,7 +26,10 @@ class Actor(nn.Module):
 		self.fc3 = nn.Linear(state_size,action_size)
 
 	def forward(self,state):
-		'''Build the network that estimates Q values for each state.
+		'''Build the network that estimates the action to be taken.
+		
+		Estimate the action to be taken. Each action has a range from 
+		-1 to 1 so the tanh activation function is used.
 
 		Parameters
 		----------
@@ -36,9 +39,7 @@ class Actor(nn.Module):
 
 		Returns
 		-------
-		Q_values : array_like
-			The Q_values for each action given the current state.
+		action : array_like
+			The action to be taken by the agent.
 		'''
-		#using tanh to bound the return values to acceptiable range.
-		#how exactly does this work? it is bound from -1 to 1
 		return F.tanh(self.fc3(F.relu(self.fc2(F.relu(self.fc1(state))))))
