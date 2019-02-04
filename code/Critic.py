@@ -5,7 +5,7 @@ import torch.nn.functional as F
 class Critic(nn.Module):
 	'''The cirtic network used by the agent.'''
 
-	def __init__(self,state_size,action_size,seed):
+	def __init__(self,state_size,action_size,seed=0):
 		'''Initlise and defined the model.
 
 		Parameters
@@ -21,9 +21,9 @@ class Critic(nn.Module):
 		'''
 		super(Critic,self).__init__()
 		self.seed = torch.manual_seed(seed)
-		self.fc1 = nn.Linear(state_size,148)
-		self.fc2 = nn.Linear(148+action_size,148)
-		self.fc3 = nn.Linear(148,1)
+		self.fc1 = nn.Linear(state_size,state_size)
+		self.fc2 = nn.Linear(state_size+action_size,state_size)
+		self.fc3 = nn.Linear(state_size,1)
 
 	def forward(self,state,action):
 		'''Build the network that estimates Q values for each state.

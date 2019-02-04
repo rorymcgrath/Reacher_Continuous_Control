@@ -5,7 +5,7 @@ import torch.nn.functional as F
 class Actor(nn.Module):
 	'''The Actor Q network used by the agent.'''
 
-	def __init__(self,state_size,action_size,seed):
+	def __init__(self,state_size,action_size,seed=0):
 		'''Initlise and defined the model.
 
 		Parameters
@@ -21,9 +21,9 @@ class Actor(nn.Module):
 		'''
 		super(Actor,self).__init__()
 		self.seed = torch.manual_seed(seed)
-		self.fc1 = nn.Linear(state_size,148)
-		self.fc2 = nn.Linear(148,148)
-		self.fc3 = nn.Linear(148,action_size)
+		self.fc1 = nn.Linear(state_size,state_size)
+		self.fc2 = nn.Linear(state_size,state_size)
+		self.fc3 = nn.Linear(state_size,action_size)
 
 	def forward(self,state):
 		'''Build the network that estimates Q values for each state.
