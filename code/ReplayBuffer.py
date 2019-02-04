@@ -3,7 +3,7 @@ import random
 import torch
 from collections import namedtuple, deque
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ReplayBuffer:
 	'''Fixed-size bugger used to store experience tuples
@@ -14,7 +14,7 @@ class ReplayBuffer:
 	Experiences are saved as named tuples of (state,action,reward,next_state,done)
 	'''	
 
-	def __init__(self, action_size, buffer_size, batch_size, seed):
+	def __init__(self, action_size, buffer_size, batch_size, seed=0):
 		'''Initlise the Replay Buffer.
 
 
