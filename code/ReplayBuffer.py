@@ -48,7 +48,7 @@ class ReplayBuffer:
 		state : array_like
 			The current state.
 		
-		action : int
+		action : array_like 
 			The action that was taken.
 
 		reward : int
