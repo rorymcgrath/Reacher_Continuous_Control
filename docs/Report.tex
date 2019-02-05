@@ -60,7 +60,6 @@ The ANN used for the critic has a similar arthecture and consisted of an input l
 
 The following hyper-parameters were used to train the agent:
 
-
 \begin{table}[h!t]
 \begin{minipage}{.5\linewidth}
 \begin{tabular}{|c|l|}
@@ -130,8 +129,18 @@ A plot of the reward verses episode number is given in [Fig \ref{results}].
 \end{figure}
 
 
-
 \section{Future Work}
+While the initial results of this agent are promising, the agents behaviour is far from optimal.
+There are several improvements that could be implemented to decrease training time and increase the average reward.
 
+A hyper-parameter optimisation technique such as grid search could be implemented to help converge on good choices for the parameters 
+specified above. 
+Ideally this would be run on a gpu server as running it on a cpu would take a considerable amount of time.
+
+The Replay Buffer could be updated to implement prioritised experience replay \cite{per_paper}. 
+The key idea here is that 'important' transitions would be sampled more frequently than unimportant ones. 
+The 'important' of transition is determined by the magnitude of it's temporal-difference error.
+This should allow the agent to learn more efficiently. 
+Given that we are no longer uniformly sampling from the experiences importance sampling will have to be added to calculate the impact of each weight when updating.
 \printbibliography
 \end{document}
