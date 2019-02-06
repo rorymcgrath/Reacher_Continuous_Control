@@ -17,7 +17,7 @@ GAMMA = 0.99
 TAU = 1e-3
 WEIGHT_DECAY = 0
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+UPDATE_EVERY = 20
 
 #Going to solve this using DDPG Deep Deterministic Policy Gradient
 
@@ -59,6 +59,7 @@ class Agent():
 
 		#Noise
 		self.noise = OUNoise(action_size,seed)
+		self.t_step = 0
 
 	def step(self, state, action, reward, next_state, done):
 		'''Instructs the agent to take a step in the environment.
@@ -85,10 +86,11 @@ class Agent():
 			True if the episode is completed, else False
 		'''
 		self.memory.add(state, action, reward, next_state, done)
-		if len(self.memory) > BATCH_SIZE:
-			experiences = self.memory.sample()
-			self.train_model_parameters(experiences)
-
+		self.t_step = (self.t_step+1)%UPDATE_EVERY
+		if self.t_step == 0:
+			if len(self.memory) > BATCH_SIZE:
+				experiences = self.memory.sample()
+				self.train_model_parameters(experiences)
 	
 	def get_action(self, state, epsilon=0, add_noise=True):
 		'''Gets the action for the given state defined by the current policy.

@@ -21,9 +21,9 @@ class Actor(nn.Module):
 		'''
 		super(Actor,self).__init__()
 		self.seed = torch.manual_seed(seed)
-		self.fc1 = nn.Linear(state_size,state_size)
-		self.fc2 = nn.Linear(state_size,state_size)
-		self.fc3 = nn.Linear(state_size,action_size)
+		self.fc1 = nn.Linear(state_size,400)
+		self.fc2 = nn.Linear(400,300)
+		self.fc3 = nn.Linear(300,action_size)
 
 	def forward(self,state):
 		'''Build the network that estimates the action to be taken.
