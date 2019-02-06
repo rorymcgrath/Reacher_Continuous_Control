@@ -38,6 +38,8 @@ scores_window = deque(maxlen=100)
 success_score = 30
 scores = []
 i_episode = 1
+print("{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
+
 try:
 	while True:
 		env_info = env.reset(train_mode=TRAIN_MODE)[brain_name]     
@@ -57,16 +59,18 @@ try:
 		scores.append(score)
 
 		if i_episode%MONITOR_INTERVAL == 0:
-			print('\rEpisode {} \tAverage Score for last {} episodes: {:.2f}'.format(i_episode, MONITOR_INTERVAL, np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0)))))
+			print('\r|   {}\t\t|   {:.2f}\t\t|\n{}'.format(i_episode, np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0))),'-'*41))
 
-		if i_episode%100 == 0:
-			print('\rEpisode {} \tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
+		if i_episode%2 == 0:
+			print('\t\tAverage Score: {:.2f}'.format(np.mean(scores_window)))
+			print("\n{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
 
 		if np.mean(scores_window) >= success_score:
-			print('Environment solved in {:d} episodes. Average Score: {:.2f} Saving model parameters.'.format(i_episode-100,np.mean(scores_window)))
+			print('{}\n Environment Solved in {:d} episodes\n Average Score: {:.2f}\n{}'.format('*'*41,i_episode-100,np.mean(scores_window),'*'*41))
 			torch.save(agent.actor_local.state_dict(), 'parameters/{}_actor_checkpoint.pth'.format(i_episode-100))
 			torch.save(agent.critic_local.state_dict(), 'parameters/{}_critic_checkpoint.pth'.format(i_episode-100))
 			success_score+=1
+			print("{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
 		i_episode+=1
 except Exception as e:
 	env.close()
