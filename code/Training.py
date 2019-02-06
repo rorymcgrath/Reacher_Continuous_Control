@@ -57,7 +57,7 @@ try:
 		scores.append(score)
 
 		if i_episode%MONITOR_INTERVAL == 0:
-			print('\rEpisode {} \tAverage Score per {} window: {:.2f}'.format(i_episode, MONITOR_INTERVAL, np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0)))))
+			print('\rEpisode {} \tAverage Score for last {} episodes: {:.2f}'.format(i_episode, MONITOR_INTERVAL, np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0)))))
 
 		if i_episode%100 == 0:
 			print('\rEpisode {} \tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
