@@ -17,7 +17,7 @@ GAMMA = 0.99
 TAU = 1e-3
 WEIGHT_DECAY = 0
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-UPDATE_EVERY = 4 
+UPDATE_EVERY = 20 
 
 #Going to solve this using DDPG Deep Deterministic Policy Gradient
 

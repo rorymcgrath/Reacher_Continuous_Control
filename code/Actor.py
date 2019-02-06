@@ -23,7 +23,8 @@ class Actor(nn.Module):
 		self.seed = torch.manual_seed(seed)
 		self.fc1 = nn.Linear(state_size,400)
 		self.fc2 = nn.Linear(400,300)
-		self.fc3 = nn.Linear(300,action_size)
+		self.fc3 = nn.Linear(300,200)
+		self.fc4 = nn.Linear(200,action_size)
 
 	def forward(self,state):
 		'''Build the network that estimates the action to be taken.
@@ -42,4 +43,4 @@ class Actor(nn.Module):
 		action : array_like
 			The action to be taken by the agent.
 		'''
-		return F.tanh(self.fc3(F.relu(self.fc2(F.relu(self.fc1(state))))))
+		return F.tanh(self.fc4(F.relu(self.fc3(F.relu(self.fc2(F.relu(self.fc1(state))))))))
