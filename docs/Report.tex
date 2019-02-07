@@ -22,15 +22,15 @@ The objective of the agent is to maintain its position at the target location fo
 
 The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. 
 Each action is a vector with four numbers, corresponding to torque applicable to two joints. 
-Every entry in the action vector should be a number between -1 and 1.
-This task is episodic,  in order to solve the environment the agent must achieve an average score of +30 over 100 consecutive episodes.
+Every entry in the action vector is between -1 and 1.
+This task is episodic, in order to solve the environment the agent must achieve an average score of +30 over 100 consecutive episodes.
 
 \section{Methods}
 \label{methods}
 An Actor-Critic approach was used to solve this problem.
 A value based method such as Deep Q Networks (DQN) \cite{dqn_paper} could have been adapted but it would require discretising the action space. 
 Depending on the required granuality of the descretisation and the degrees of freedom in the arm this would lead to a rapidly growing action space \cite{curse_of_dimensionality}.
-With this limitation in mind an Actor-Critic algorithm Deep Deterministic Policy Gradients (DDPG)\cite{ddpg_paper} was implemented.
+With this limitation in mind the Actor-Critic algorithm Deep Deterministic Policy Gradients (DDPG)\cite{ddpg_paper} was implemented.
 
 Similar to DQN, DDPG uses deep artifical neural networks as large non-linear function approximators for the value function.
 In order to train these function approximators in a stabe and robust way DDPG also uses a Replay Buffer\cite{experience_replay} and updates the target networks with "soft target updates" \cite{ddpg_paper}.
@@ -38,13 +38,22 @@ The DDPG maintains four seperate ANNs.
 Two are the local and target actor functions and two are the local and target critic functions.
 The actor function $\mu(s|\theta^{\mu})$ specifies the current policy by deterministically mapping states to a specific action.
 The critic function $Q(s,a)$ is learned using the Bellman equation.
+Given that the action space is in the range of -1 to 1 the final activation function in the actor network is a tanh function.
+The tanh function is given in equation [\ref{tanh_equation}]
+\begin{equation}
+\label{tanh_equation}
+f(x) = \frac{(e^x - e^{-x})}{(e^x+e^{-x})}
+\end{equation}
 
 One issue with learning in continuous space is exploration.
 How does the agent explore the environment?
 Given that this is an off-policy algorithm we can construct an exploration policy $\mu'$ by adding noise sampled from a noise process $N$.
-Adding this noise to the actor policy yields an exploration policy:
-$$\mu'(s_t) = \mu(s_t|\theta_t^\mu) + N$$
+Adding this noise to the actor policy yields an exploration policy [\ref{exploration_policy}].
 
+\begin{equation}
+\label{exploration_policy}
+\mu'(s_t) = \mu(s_t|\theta_t^\mu) + N
+\end{equation}
 When observing the behaviour of the trained agent this exploration can be turned off.
 
 \section{Results}
@@ -56,7 +65,7 @@ The activation functions for the input and hidden layer was the rectified linear
 The output layers activation function was the hyperbolic tangent function (tanh). 
 This maps the output to a range between -1 and 1 which is the required input for the motors
 
-The ANN used for the critic has a similar arthecture and consisted of an input layer of 33 nodes, one dense hidden layer of 33 nodes and an output layer of 1 node.
+The ANN used for the critic has a similar arthecture and consisted of an input layer of 33 nodes, one dense hidden layer of 33 nodes and an output layer of 1 node. The action tensor was added to the last hidden layer similar to the paper \cite{ddpg_paper}.
 
 The following hyper-parameters were used to train the agent:
 
@@ -70,7 +79,7 @@ The following hyper-parameters were used to train the agent:
 	\textbf{Parameter} & \textbf{Value}\\
 	\hline
 	$\gamma$ & $0.99$\\
-	$\alpha$ & $5e^{-4}$\\
+	$\tau$ & $1e^{-3}$\\
 	\hline
 \end{tabular}
 \end{minipage}
@@ -83,11 +92,12 @@ The following hyper-parameters were used to train the agent:
 	\textbf{Parameter} & \textbf{Value}\\
 	\hline
 	Buffer Size & $1e^{5}$\\
-	Batch Size & $64$\\
+	Batch Size & $1024$\\
 	\hline
 \end{tabular}
 \end{minipage}
 \end{table}
+
 \begin{table}
 \begin{minipage}{.5\linewidth}
 \begin{tabular}{|c|l|}
@@ -97,8 +107,8 @@ The following hyper-parameters were used to train the agent:
 	\hline
 	\textbf{Parameter} & \textbf{Value}\\
 	\hline
-		$\tau$ & $1e^{-3}$\\
 		Update Rate & every 4 time-steps \\
+		Learning Rate & $1e^{-4}$ \\
 	\hline
 \end{tabular}
 \end{minipage}
@@ -110,8 +120,8 @@ The following hyper-parameters were used to train the agent:
 	\hline
 	\textbf{Parameter} & \textbf{Value}\\
 	\hline
-		$\tau$ & $1e^{-3}$\\
 		Update Rate & every 4 time-steps \\
+		Learning Rate & $1e^{-3}$ \\
 	\hline
 \end{tabular}
 \end{minipage}
@@ -133,14 +143,17 @@ A plot of the reward verses episode number is given in [Fig \ref{results}].
 While the initial results of this agent are promising, the agents behaviour is far from optimal.
 There are several improvements that could be implemented to decrease training time and increase the average reward.
 
+One of the most difficult aspects of this project was find hyper-aparameter that lead to stable learning.
+Trying out variations of hyper-parameters along with different network achitectures was extreamly time consuming.
 A hyper-parameter optimisation technique such as grid search could be implemented to help converge on good choices for the parameters 
 specified above. 
-Ideally this would be run on a gpu server as running it on a cpu would take a considerable amount of time.
+Here you could set the ranges and combinations you wanted to investigate and run the search on a gpu server.
 
 The Replay Buffer could be updated to implement prioritised experience replay \cite{per_paper}. 
 The key idea here is that 'important' transitions would be sampled more frequently than unimportant ones. 
 The 'important' of transition is determined by the magnitude of it's temporal-difference error.
 This should allow the agent to learn more efficiently. 
 Given that we are no longer uniformly sampling from the experiences importance sampling will have to be added to calculate the impact of each weight when updating.
+
 \printbibliography
 \end{document}
