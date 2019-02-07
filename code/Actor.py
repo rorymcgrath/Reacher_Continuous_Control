@@ -42,4 +42,4 @@ class Actor(nn.Module):
 		action : array_like
 			The action to be taken by the agent.
 		'''
-		return torch.tanh(F.relu(self.fc3(F.relu(self.fc2(F.relu(self.fc1(state)))))))
+		return torch.tanh(F.relu(self.fc2(F.relu(self.fc1(state)))))
