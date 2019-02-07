@@ -10,7 +10,7 @@ from Actor import Actor
 from Critic import Critic 
 
 ACTOR_LEARNING_RATE = 1e-4
-CRITIC_LEARNING_RATE = 1e-4
+CRITIC_LEARNING_RATE = 1e-3
 BUFFER_SIZE = int(1e5)
 BATCH_SIZE = 1024
 GAMMA = 0.99
@@ -18,8 +18,6 @@ TAU = 1e-3
 WEIGHT_DECAY = 0
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 UPDATE_EVERY = 20 
-
-#Going to solve this using DDPG Deep Deterministic Policy Gradient
 
 class Agent():
 	'''This agent Interacts with the environment to learn a policy that yields the highest commulative reward.
