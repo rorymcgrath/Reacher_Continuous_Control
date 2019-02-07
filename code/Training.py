@@ -61,7 +61,7 @@ try:
 		if i_episode%MONITOR_INTERVAL == 0:
 			print('\r|   {}\t\t|   {:.2f}\t\t|\n{}'.format(i_episode, np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0))),'-'*41))
 
-		if i_episode%2 == 0:
+		if i_episode%100 == 0:
 			print('\t\tAverage Score: {:.2f}'.format(np.mean(scores_window)))
 			print("\n{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
 
