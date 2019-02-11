@@ -6,7 +6,7 @@ import torch
 import pickle
 
 NO_GRAPHICS = True
-GPU_SERVER = False
+GPU_SERVER = False 
 MONITOR_INTERVAL = 10
 TRAIN_MODE = True
 
@@ -35,13 +35,13 @@ print('The state for the first agent looks like:', states[0])
 agent = Agent(state_size, action_size, seed=0)
 
 scores_window = deque(maxlen=100)
-success_score = 30
+success_score = 5
 scores = []
 i_episode = 1
 print("{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
 
 try:
-	while True:
+	while success_score <= 30:
 		env_info = env.reset(train_mode=TRAIN_MODE)[brain_name]     
 		state = env_info.vector_observations[0]                  
 		score = 0
@@ -65,18 +65,28 @@ try:
 			print('\t\tAverage Score: {:.2f}'.format(np.mean(scores_window)))
 			print("\n{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
 
+		if i_episode%1000 == 0:
+			torch.save(agent.actor_local.state_dict(), 'checkpoint/actor.pth'.format(i_episode-100))
+			torch.save(agent.critic_local.state_dict(), 'checkpoint/critic.pth'.format(i_episode-100))
+			success_score+=1
+			with open('checkpoint/scores.pkl'.format(i_episode-100),'wb') as f:
+				pickle.dump(scores,f)
+
 		if np.mean(scores_window) >= success_score:
 			print('{}\n Environment Solved in {:d} episodes\n Average Score: {:.2f}\n{}'.format('*'*41,i_episode-100,np.mean(scores_window),'*'*41))
-			torch.save(agent.actor_local.state_dict(), 'parameters/{}_actor_checkpoint.pth'.format(i_episode-100))
-			torch.save(agent.critic_local.state_dict(), 'parameters/{}_critic_checkpoint.pth'.format(i_episode-100))
+			torch.save(agent.actor_local.state_dict(), 'checkpoint/{}_actor_checkpoint.pth'.format(i_episode-100))
+			torch.save(agent.critic_local.state_dict(), 'checkpoint/{}_critic_checkpoint.pth'.format(i_episode-100))
 			success_score+=1
+			with open('checkpoint/{}_scores.pkl'.format(i_episode-100),'wb') as f:
+				pickle.dump(scores,f)
 			print("{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
 		i_episode+=1
+
 except Exception as e:
 	env.close()
-	torch.save(agent.actor_local.state_dict(), 'parameters/recovery_actor_checkpoint.pth')
-	torch.save(agent.critic_local.state_dict(), 'parameters/recovery_critic_checkpoint.pth')
-	with open('recovery_scores.pkl','wb') as f:
+	torch.save(agent.actor_local.state_dict(), 'checkpoint/recovery_actor_checkpoint.pth')
+	torch.save(agent.critic_local.state_dict(), 'checkpoint/recovery_critic_checkpoint.pth')
+	with open('checkpoint/recovery_scores.pkl','wb') as f:
 		pickle.dump(scores,f)
 	print(e)
 	
