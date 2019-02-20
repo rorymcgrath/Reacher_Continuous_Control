@@ -60,12 +60,12 @@ When observing the behaviour of the trained agent this exploration can be turned
 Using the methodology described above [\ref{methods}] an agent was trained to solve the environment.
 The agent was written in pyTorch and was run using the openai gym toolkit.
 
-The ANN used for the actor consisted of an input layer of 33 nodes, one dense hidden layer of 33 nodes and an output layer of 4 nodes.
+The ANN used for the actor consisted of an input layer of 33 nodes, one dense hidden layer of 256 nodes and an output layer of 4 nodes.
 The activation functions for the input and hidden layer was the rectified linear units (ReLUs). 
 The output layers activation function was the hyperbolic tangent function (tanh). 
 This maps the output to a range between -1 and 1 which is the required input for the motors
 
-The ANN used for the critic has a similar arthecture and consisted of an input layer of 33 nodes, one dense hidden layer of 33 nodes and an output layer of 1 node. The action tensor was added to the last hidden layer similar to the paper \cite{ddpg_paper}.
+The ANN used for the critic has a similar arthecture and consisted of an input layer of 33 nodes, one dense hidden layer of 256 nodes and an output layer of 1 node. The action tensor was added to the last hidden layer similar to the paper \cite{ddpg_paper}.
 
 The following hyper-parameters were used to train the agent:
 
@@ -107,7 +107,7 @@ The following hyper-parameters were used to train the agent:
 	\hline
 	\textbf{Parameter} & \textbf{Value}\\
 	\hline
-		Update Rate & every 4 time-steps \\
+		Update Rate & every 20 time-steps \\
 		Learning Rate & $1e^{-4}$ \\
 	\hline
 \end{tabular}
@@ -120,15 +120,15 @@ The following hyper-parameters were used to train the agent:
 	\hline
 	\textbf{Parameter} & \textbf{Value}\\
 	\hline
-		Update Rate & every 4 time-steps \\
+		Update Rate & every 20 time-steps \\
 		Learning Rate & $1e^{-3}$ \\
 	\hline
 \end{tabular}
 \end{minipage}
 \end{table}
 
-The model was trained for ??? episodes. 
-After ??? episodes the model achieved it's target of an average of +30 over 100 episodes.
+The model was trained for 3,000 episodes. 
+After 1,993 episodes the model achieved it's target of an average of +30 over 100 episodes.
 A plot of the reward verses episode number is given in [Fig \ref{results}].
 
 \begin{figure}

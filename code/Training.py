@@ -6,7 +6,7 @@ import torch
 import pickle
 
 NO_GRAPHICS = True
-GPU_SERVER = False 
+GPU_SERVER = True 
 MONITOR_INTERVAL = 10
 TRAIN_MODE = True
 
@@ -38,7 +38,7 @@ scores_window = deque(maxlen=100)
 success_score = 5
 scores = []
 i_episode = 1
-print("{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
+print(" {0} {0}\n|   Episode Number\t|   Avg Score({1})\t|\n {2} {2}".format('_'*23,MONITOR_INTERVAL,'-'*23))
 
 try:
 	while success_score <= 30:
@@ -59,11 +59,11 @@ try:
 		scores.append(score)
 
 		if i_episode%MONITOR_INTERVAL == 0:
-			print('\r|   {}\t\t|   {:.2f}\t\t|\n{}'.format(i_episode, np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0))),'-'*41))
+			print('\r|   {0}\t{1}|   {2:.2f}\t\t|\n {3} {3}'.format(i_episode, '\t\t' if i_episode < 1000 else '\t',  np.mean(list(scores_window[i] for i in range(-1*MONITOR_INTERVAL,0))),'-'*23))
 
 		if i_episode%100 == 0:
 			print('\t\tAverage Score: {:.2f}'.format(np.mean(scores_window)))
-			print("\n{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
+			print(" {0} {0}\n|   Episode Number\t|   Avg Score({1})\t|\n {2} {2}".format('_'*23,MONITOR_INTERVAL,'-'*23))
 
 		if i_episode%1000 == 0:
 			torch.save(agent.actor_local.state_dict(), 'checkpoint/actor.pth'.format(i_episode-100))
@@ -73,13 +73,13 @@ try:
 				pickle.dump(scores,f)
 
 		if np.mean(scores_window) >= success_score:
-			print('{}\n Environment Solved in {:d} episodes\n Average Score: {:.2f}\n{}'.format('*'*41,i_episode-100,np.mean(scores_window),'*'*41))
+			print('{}\n Environment Solved in {:d} episodes\n Average Score: {:.2f}\n{}'.format('*'*48,i_episode-100,np.mean(scores_window),'*'*48))
 			torch.save(agent.actor_local.state_dict(), 'checkpoint/{}_actor_checkpoint.pth'.format(i_episode-100))
 			torch.save(agent.critic_local.state_dict(), 'checkpoint/{}_critic_checkpoint.pth'.format(i_episode-100))
 			success_score+=1
 			with open('checkpoint/{}_scores.pkl'.format(i_episode-100),'wb') as f:
 				pickle.dump(scores,f)
-			print("{}\n|   Episode\t|   Avg Score({})\t|\n{}".format('_'*41,MONITOR_INTERVAL,'-'*41))
+			print(" {0} {0}\n|   Episode Number\t|   Avg Score({1})\t|\n {2} {2}".format('_'*23,MONITOR_INTERVAL,'-'*23))
 		i_episode+=1
 
 except Exception as e:
