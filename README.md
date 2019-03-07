@@ -1,8 +1,7 @@
 [//]: # (Image References)
 
 [image1]: https://user-images.githubusercontent.com/1038278/53906334-94cd1c00-4042-11e9-8937-6d5c06b8bffb.gif "Trained Agent"
-
-[image2]: https://user-images.githubusercontent.com/10624937/42386929-76f671f0-8106-11e8-9376-f17da2ae852e.png "Kernel"
+[image2]: https://user-images.githubusercontent.com/1038278/53953719-f9808900-40cb-11e9-9eb8-1f45a2784c02.png "Kernel"
 
 # Continuous Control
 
